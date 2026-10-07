@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unit 2 Review Game: Expanding Early America</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1f2a36; --ink-2:#2a3a4b; --paper:#f4efe6; --card:#fbf8f2; --rule:#ddd3c3;
+  --accent:#a8481f; --accent-lt:#e8a066; --slate:#2f5a73; --muted:#5a6470;
+  --good:#2e7d4f; --bad:#b3261e;
+  --serif:'Source Serif 4', Georgia, serif; --sans:'Source Sans 3', 'Segoe UI', Arial, sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --paper:#e9e2d4; --card:#f4efe6; } }
+:root[data-theme="dark"]{ --paper:#e9e2d4; --card:#f4efe6; }
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0; min-height:100%; background:var(--ink); color:var(--paper); font-family:var(--sans); font-size:clamp(16px,1.25vw,22px)}
+button{font:inherit; cursor:pointer}
+.wrap{max-width:1600px; margin:0 auto; padding:clamp(12px,2vw,32px)}
+header{display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:clamp(12px,1.6vw,24px)}
+h1{font-family:var(--serif); font-weight:700; font-size:clamp(26px,2.6vw,48px); margin:0; line-height:1.05}
+.sub{color:#b9c0c8; margin:6px 0 0}
+.tools{display:flex; gap:10px; flex-wrap:wrap}
+.btn{background:transparent; color:var(--paper); border:2px solid #4a5a6b; border-radius:8px; padding:8px 16px}
+.btn:hover{border-color:var(--accent-lt)}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+.btn.primary:hover{background:#8f3c19}
+
+/* board */
+.board{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:clamp(6px,0.7vw,12px)}
+.cat{background:var(--slate); border-radius:8px; padding:clamp(8px,1vw,16px) 10px; text-align:center; font-family:var(--serif); font-weight:700; font-size:clamp(14px,1.25vw,24px); line-height:1.15; display:flex; align-items:center; justify-content:center; min-height:clamp(56px,6vw,96px)}
+.tile{background:var(--paper); color:var(--accent); border:none; border-radius:8px; font-family:var(--serif); font-weight:700; font-size:clamp(24px,3vw,56px); min-height:clamp(62px,7.2vw,124px); transition:transform .12s ease}
+.tile:hover{transform:scale(1.03)}
+.tile.used{background:var(--ink-2); color:#4a5a6b; cursor:default; transform:none}
+.final-row{margin-top:clamp(10px,1.2vw,18px); display:flex; justify-content:center}
+
+/* scoreboard */
+.scores{display:flex; gap:clamp(8px,1vw,16px); margin-top:clamp(14px,1.6vw,24px); flex-wrap:wrap}
+.team{flex:1 1 160px; background:var(--ink-2); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; border-top:5px solid var(--accent-lt)}
+.team input{background:transparent; border:none; color:var(--paper); font:inherit; font-weight:700; width:100%; padding:0}
+.team input:focus{outline:2px solid var(--accent-lt); outline-offset:2px}
+.score{font-family:var(--serif); font-weight:700; font-size:clamp(28px,2.6vw,46px); line-height:1}
+.adj{display:flex; gap:6px}
+.adj button{flex:1; background:transparent; border:1px solid #4a5a6b; color:#c9d0d8; border-radius:6px; padding:2px 0}
+
+/* question overlay */
+.overlay{position:fixed; inset:0; background:var(--ink); display:none; overflow:auto; z-index:10}
+.overlay.open{display:block}
+.q{max-width:1300px; margin:0 auto; padding:clamp(20px,3vw,56px); padding-top:calc(env(safe-area-inset-top,0px) + clamp(20px,3vw,48px))}
+.q-meta{display:flex; justify-content:space-between; align-items:center; gap:16px; color:var(--accent-lt); font-weight:700; font-size:clamp(16px,1.3vw,24px)}
+.q-meta .tag{color:#b9c0c8; font-weight:600}
+.q h2{font-family:var(--serif); font-weight:700; font-size:clamp(28px,3vw,54px); line-height:1.15; margin:clamp(14px,1.6vw,28px) 0}
+.select-note{display:inline-block; background:var(--accent); color:#fff; border-radius:6px; padding:4px 12px; font-weight:700; margin-bottom:14px}
+.opts{display:grid; grid-template-columns:1fr 1fr; gap:clamp(10px,1.2vw,18px)}
+.opt{width:100%; text-align:left; cursor:pointer; font-family:inherit; background:var(--paper); color:var(--ink); border-radius:10px; padding:clamp(14px,1.4vw,24px); font-size:clamp(18px,1.7vw,32px); line-height:1.25; display:flex; gap:14px; align-items:flex-start; border:4px solid transparent}
+.opt b{font-family:var(--serif); color:var(--accent)}
+.opt.right{border-color:var(--good); background:#e3f1e8}
+.opt.wrong{opacity:.38}
+.opt.miss{border-color:var(--bad); background:#f6dcda}
+.opt.miss b{color:var(--bad)}
+.opt.right b{color:var(--good)}
+.opt:not(.right):not(.miss):not(.wrong):hover{border-color:var(--accent-lt)}
+.redeem{min-height:1.4em; margin:14px 0 0; font-weight:700; font-size:clamp(18px,1.6vw,28px)}
+.redeem.bad{color:#ff8a80}
+.redeem.good{color:#8fd6a8}
+.explain{display:none; margin-top:clamp(16px,1.8vw,28px); background:var(--slate); border-radius:10px; padding:clamp(14px,1.4vw,24px); font-size:clamp(18px,1.6vw,28px); line-height:1.35}
+.explain.show{display:block}
+.explain .es{display:block; margin-top:8px; color:#d6e3ea; font-size:.8em}
+.remember{background:var(--paper); color:var(--ink); border-left:8px solid var(--accent); border-radius:8px; padding:clamp(12px,1.2vw,20px) clamp(14px,1.4vw,24px); font-family:var(--serif); font-weight:700; font-size:clamp(20px,1.9vw,34px); line-height:1.3}
+.rlabel{display:block; font-family:var(--sans); font-weight:700; font-size:.55em; color:var(--accent); margin-bottom:6px}
+.why{margin:14px 0 0; font-size:.85em}
+.q-actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:clamp(16px,1.8vw,28px); align-items:center}
+.award{display:none; gap:10px; flex-wrap:wrap}
+.award.show{display:flex}
+.award .btn{border-color:var(--good)}
+.award .btn.miss{border-color:var(--bad)}
+.hint{color:#8e99a4; font-size:.8em; margin-left:auto}
+.chart{display:flex; gap:24px; align-items:center; margin-bottom:16px; flex-wrap:wrap}
+.chart ul{list-style:none; padding:0; margin:0; font-size:clamp(16px,1.4vw,24px); line-height:1.6}
+.chart li span{display:inline-block; width:18px; height:18px; border-radius:4px; margin-right:10px; vertical-align:-2px}
+
+/* final round */
+.wagers{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:16px 0}
+.wager{background:var(--ink-2); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:8px}
+.wager input{font:inherit; padding:6px 8px; border-radius:6px; border:1px solid #4a5a6b; background:var(--paper); color:var(--ink); width:100%}
+.wager .row{display:flex; gap:8px}
+.wager .row button{flex:1}
+.wager .done{color:var(--accent-lt); font-weight:700}
+@media (max-width:760px){ .opts{grid-template-columns:1fr} .board{grid-template-columns:repeat(3,minmax(0,1fr))} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Unit 2 Review: Expanding Early America</h1>
+      <p class="sub">Pick a category and a value. Teams talk it over, then everyone holds up an answer.</p>
+    </div>
+    <div class="tools">
+      <button class="btn" id="addTeam">Add team</button>
+      <button class="btn" id="removeTeam">Remove team</button>
+      <button class="btn" id="reset">New game</button>
+    </div>
+  </header>
+  <div class="board" id="board" aria-label="Game board"></div>
+  <div class="final-row"><button class="btn primary" id="finalBtn">Final Question</button></div>
+  <div class="scores" id="scores" aria-label="Scoreboard"></div>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="qText">
+  <div class="q" id="qBox"></div>
+</div>
+
+<script>
+const PIE = `<div class="chart"><svg width="220" height="220" viewBox="0 0 220 220" role="img" aria-label="Circle graph of slaveholding in 1850">
+<path d="M110,110 L110,10 A100,100 0 1 1 32.9,173.7 Z" fill="#c9bfae"/>
+<path d="M110,110 L32.9,173.7 A100,100 0 0 1 19.5,67.4 Z" fill="#2f5a73"/>
+<path d="M110,110 L19.5,67.4 A100,100 0 0 1 94.4,11.2 Z" fill="#a8481f"/>
+<path d="M110,110 L94.4,11.2 A100,100 0 0 1 110,10 Z" fill="#0f1720"/></svg>
+<ul><li><span style="background:#c9bfae"></span>Held no enslaved people: 64%</li><li><span style="background:#2f5a73"></span>Held fewer than 5: 18%</li><li><span style="background:#a8481f"></span>Held 5–49: 15.5%</li><li><span style="background:#0f1720;outline:1px solid #8e99a4"></span>Held 50 or more: 2.5%</li></ul></div>`;
+
+const CATS = [
+ {name:'Jefferson and the Courts', qs:[
+  {q:'It\'s 1804. An Ohio farmer can now ship crops down the Mississippi and through New Orleans without a foreign country closing the port. Why?', o:['The U.S. won the War of 1812','The U.S. bought the Louisiana Territory from France','Spain gave the U.S. Florida','The Erie Canal opened'], a:[1], e:'The Louisiana Purchase (1803) gave the U.S. New Orleans and the huge territory west of the Mississippi.', es:'Compra de Luisiana: el país creció al oeste del río Misisipi.', m:'The Louisiana Purchase (1803) expanded the U.S. west of the Mississippi River.'},
+  {q:'Someone claims a new federal law breaks the Constitution. Because of judicial review, who has the final say?', o:['Congress','The president','The Supreme Court','The state governors'], a:[2], e:'Judicial review lets the Supreme Court decide whether a law is constitutional and strike it down if it is not.', es:'Revisión judicial: la Corte Suprema decide si una ley es constitucional.', m:'Judicial review means the Supreme Court decides if laws are constitutional.'},
+  {q:'Jefferson wrote: "Those who labour in the earth are the chosen people of God." What does this show about his vision for America?', o:['He wanted a nation built on factories','He believed independent farmers were the backbone of the republic','He wanted a powerful navy','He supported a national bank'], a:[1], e:'Jefferson believed landowning farmers made the best citizens, which is why gaining land mattered so much to him.', es:'Jefferson creía que los agricultores dueños de tierra eran la base de la república.', m:'Jefferson believed a republic needed citizens who owned land and farmed.'},
+  {q:'Who am I? "I never got my job as a justice of the peace, but my lawsuit gave the Supreme Court its most important power."', o:['John Marshall','James Madison','William Marbury','Thomas Jefferson'], a:[2], e:'In Marbury v. Madison (1803), the Court ruled part of the Judiciary Act of 1789 unconstitutional. That created judicial review and showed the Court was an independent branch.', es:'Marbury contra Madison creó la revisión judicial.', m:'In Marbury v. Madison, the Court ruled part of a federal law unconstitutional, creating judicial review.'},
+  {q:'Jefferson wanted a small federal government, but some of his actions made the presidency stronger. Which is the best example?', o:['Cutting the size of the army','Lowering federal taxes','Buying Louisiana even though the Constitution did not clearly allow it','Ending the whiskey tax'], a:[2], e:'Buying land was not listed as a presidential power. He also sent the navy to fight the Barbary pirates. Both expanded executive power.', es:'Jefferson amplió el poder ejecutivo.', m:'Jefferson expanded presidential power by buying Louisiana and sending the navy against the Barbary pirates.'}
+ ]},
+ {name:'The War of 1812', qs:[
+  {q:'A British officer boards an American ship at sea and forces three American sailors to serve in the Royal Navy. What is this called?', o:['An embargo','Impressment','A tariff','A blockade'], a:[1], e:'Impressment angered Americans and was one of the main causes of the war.', es:'Reclutamiento forzoso de marineros.', m:'Impressment means forcing American sailors into the British navy.'},
+  {q:'After the Embargo Act of 1807 stopped American trade with other countries, which group was hurt the most?', o:['Southern planters','New England merchants and shipowners','Western farmers','Native Americans'], a:[1], e:'The embargo was meant to pressure Britain and France and ease tensions without war. Instead, it crushed American shipping and trade.', es:'El embargo buscaba presionar sin guerra, pero dañó a los comerciantes.', m:'The Embargo Act tried to pressure Britain and France and ease tensions without war.'},
+  {q:'In 1814, First Lady Dolley Madison saved a portrait of George Washington just before British troops did what?', o:['Captured Baltimore','Burned the White House and the Capitol','Blockaded Boston','Attacked New Orleans'], a:[1], e:'British troops invaded Washington, D.C., and set fire to the White House and the Capitol.', es:'Quemaron la Casa Blanca y el Capitolio.', m:'In 1814, the British burned the White House and the Capitol.'},
+  {q:'Which order of events is correct?', o:['Battle of New Orleans → war declared → Treaty of Ghent','War declared → Battle of New Orleans → Treaty of Ghent','War declared → Treaty of Ghent signed → Battle of New Orleans','Treaty of Ghent → war declared → Battle of New Orleans'], a:[2], e:'The treaty was signed in December 1814. News traveled slowly, so the battle was fought in January 1815. It did not end the war, but it made Jackson a hero.', es:'La batalla ocurrió después del tratado; Jackson se hizo héroe.', m:'The Battle of New Orleans came after the peace treaty, but it made Andrew Jackson a war hero.'},
+  {q:'A "War Hawk" in Congress in 1812 would most likely say:', o:['"Trade with Britain is going fine. Leave it alone."','"Britain seizes our ships and kidnaps our sailors. We must fight!"','"We should join Britain against France."','"Factories matter more than ships."'], a:[1], e:'War Hawks pushed for war over British trade restrictions and impressment.', es:'Causas: restricciones comerciales y reclutamiento forzoso.', m:'The War of 1812 was caused by British trade restrictions and impressment.'}
+ ]},
+ {name:'The Age of Jackson', qs:[
+  {q:'An 1836 cartoon shows the Bank as a many-headed monster, with Jackson fighting it with a cane. What did Jackson think the Bank was?', o:['A tool to help poor farmers','A monopoly that served the wealthy','A state bank','A branch of the army'], a:[1], e:'Jackson believed the Bank gave rich elites too much power, so he vetoed its recharter.', es:'Un monopolio al servicio de los ricos.', m:'Jackson saw the Bank as a monopoly that only helped the wealthy.'},
+  {q:'Before 1830, the Cherokee lived in Georgia, Tennessee, and the Carolinas. By 1840, most lived where?', o:['Florida','Canada','Indian Territory, west of the Mississippi','Ohio'], a:[2], e:'The Indian Removal Act of 1830 forced Southeastern tribes onto land west of the Mississippi, in present-day Oklahoma.', es:'Fueron expulsados al oeste del río Misisipi.', m:'The Indian Removal Act forced Native Americans west of the Mississippi River.'},
+  {q:'Why is the Cherokee removal called the "Trail of Tears"?', o:['It rained for the whole journey','Thousands died from disease, hunger, and cold on the forced march','The Cherokee chose to leave their homes','It followed a river named Tears'], a:[1], e:'The Cherokee were forced west in 1838–1839. Thousands died along the way.', es:'Miles murieron en la marcha forzada.', m:'On the Trail of Tears, the Cherokee were forced west and thousands died.'},
+  {q:'Which statement about Indian Removal is FALSE?', o:['It was forced by the U.S. government','Thousands of Native Americans died','The Cherokee left voluntarily and were treated fairly','It opened land in the Southeast to white settlers'], a:[2], e:'Watch for words like "voluntarily" and "fairly." Removal was forced and caused great hardship and loss of life.', es:'La expulsión fue forzada, no voluntaria.', m:'Indian Removal led to forced relocation, hardship, and great loss of life.'},
+  {q:'Historian A: "Jackson defended the common man against rich bankers." Historian B: "Jackson acted like a king and ignored limits on his power." What do BOTH historians agree on?', o:['The Bank was good for the country','Jackson was a weak president','Jackson took strong, personal action against the Bank','Congress controlled the Bank fight'], a:[2], e:'They disagree about WHY it mattered (democracy vs. presidential power), but both agree Jackson took bold action.', es:'Ambos coinciden en que Jackson actuó con fuerza contra el Banco.', m:'Jackson fought the Bank to limit the wealthy, but it also expanded presidential power.'}
+ ]},
+ {name:'Manifest Destiny and the West', qs:[
+  {q:'In the painting "American Progress" (1872), a giant woman floats west carrying a schoolbook and telegraph wire while Native Americans flee ahead of her. What idea does it show?', o:['Manifest Destiny','The American System','Judicial review','The spoils system'], a:[0], e:'The painting shows the belief that Americans were destined to spread across the continent.', es:'Destino Manifiesto: el país debía extenderse por todo el continente.', m:'Manifest Destiny was the belief that God wanted Americans to take the whole continent.'},
+  {q:'Your family in Missouri decides to take the Oregon Trail in 1845. What are you most likely hoping to find?', o:['Gold','Fertile farmland','Factory jobs','A railroad'], a:[1], e:'"Oregon fever" was about rich farmland. The California gold rush came later, in 1849.', es:'Buscaban tierra fértil para cultivar.', m:'Most settlers went to Oregon for fertile farmland.'},
+  {q:'Which land gave the U.S. California, Nevada, Utah, and parts of Arizona and New Mexico?', o:['The Louisiana Purchase','The Gadsden Purchase','The Mexican Cession','The Oregon Country'], a:[2], e:'The Mexican Cession (1848) stretched the U.S. to the Pacific in the Southwest, completing Manifest Destiny.', es:'La Cesión Mexicana.', m:'The Mexican Cession completed the goal of Manifest Destiny.'},
+  {q:'Spot the errors: "After the Mexican-American War, Mexico paid the U.S. $15 million, and the new border was the Mississippi River." Which version fixes both?', o:['The U.S. paid Mexico $15 million, and the border was the Rio Grande','Mexico paid $15 million, and the border was the Rio Grande','The U.S. paid Mexico, and the border was the Mississippi','No money changed hands, and the border was the Nueces River'], a:[0], e:'The Treaty of Guadalupe Hidalgo made the U.S. much larger and set the Texas border at the Rio Grande. The U.S. paid Mexico.', es:'EE. UU. pagó a México; la frontera fue el río Bravo.', m:'The Treaty of Guadalupe Hidalgo made the U.S. bigger and set the Rio Grande border. The U.S. paid Mexico.'},
+  {q:'A senator in 1846 says, "It is our destiny to spread liberty from sea to sea." He is most likely using this idea to…', o:['argue against going to war','justify taking land from Mexico','free enslaved people','limit immigration'], a:[1], e:'Manifest Destiny was a belief used to justify expansion, including war with Mexico.', es:'Se usó para justificar la expansión.', m:'Manifest Destiny was used to justify expansion across the continent.'}
+ ]},
+ {name:'Industry in the North', qs:[
+  {q:'You run a store in Chicago in 1855 and need to ship goods to a town with no river nearby. What is your best option?', o:['A canal boat','A steamboat','A railroad','A flatboat'], a:[2], e:'Canals and steamboats needed water. Trains were faster and could go anywhere track was laid.', es:'El ferrocarril podía ir a cualquier lugar.', m:'Railroads had the greatest impact on the West because they could go anywhere track was laid.'},
+  {q:'A British shirt costs $1.00 and an American shirt costs $1.20. A tariff raises the British shirt to $1.50. What happens?', o:['Prices go down for everyone','Americans are more likely to buy the American shirt','Britain sells more shirts','Trade with Britain becomes illegal'], a:[1], e:'That was Clay\'s goal: tariffs make American-made goods the better deal.', es:'Los aranceles hacen que se compren productos estadounidenses.', m:'Clay\'s tariffs were meant to make Americans buy American-made goods.'},
+  {q:'In 1790, a broken rifle part had to be handmade by a gunsmith. By 1850, you could just swap in an identical part. What made the difference?', o:['The telegraph','Interchangeable parts','Labor unions','The cotton gin'], a:[1], e:'Identical, machine-made parts allowed factories to mass-produce goods efficiently.', es:'Piezas intercambiables: producción en masa.', m:'Interchangeable parts led to the mass production of identical goods.'},
+  {q:'New York, 1832: garbage in the streets, waste in the water, and a cholera outbreak kills thousands. What is the root cause, and how did cities respond?', o:['Poor sanitation → cities improved municipal sanitation','Mill pollution → cities closed factories','Immigration → cities banned immigrants','Bad food → cities passed food laws'], a:[0], e:'Inadequate sanitation spread disease. Epidemics pushed cities to improve sanitation systems.', es:'Saneamiento inadecuado; las ciudades mejoraron el saneamiento.', m:'Poor sanitation caused disease, so cities improved municipal sanitation.'},
+  {q:'In 1835, factory workers go on strike for a 10-hour workday. A judge at the time would most likely say:', o:['"Strikes are protected by law."','"Unions are illegal conspiracies that interfere with free enterprise."','"The workers deserve a raise."','"Only the president can decide this."'], a:[1], e:'Courts treated unions as unlawful until Commonwealth v. Hunt (1842).', es:'Los tribunales veían a los sindicatos como ilegales.', m:'Courts saw unions as unlawful and an obstacle to free enterprise.'}
+ ]},
+ {name:'Slavery in the South', qs:[
+  {q:'A planter owns wet, swampy land along the Georgia coast. Which cash crop is he most likely growing?', o:['Tobacco','Wheat','Rice','Sugarcane'], a:[2], e:'Rice grew in the wet coastal lowlands of South Carolina and Georgia.', es:'El arroz.', m:'Rice was the cash crop on the coast of South Carolina and Georgia.'},
+  {q:'An enslaved man finishes his assigned rows by mid-afternoon, then works in his own garden. Which labor system is he under?', o:['The gang system','The task system','Sharecropping','Indentured servitude'], a:[1], e:'In the task system, people had a set of jobs each day. In the gang system, they worked sunup to sundown under a driver.', es:'Sistema de tareas.', m:'Task system: a set of jobs each day. Gang system: sunup to sundown.'},
+  {q:'Cause and effect: The cotton gin cleans cotton much faster → planters grow far more cotton → ?', o:['Fewer enslaved workers are needed','The demand for enslaved labor skyrockets','Cotton moves to Northern farms','Factories move to the South'], a:[1], e:'The gin only sped up cleaning. Planting and picking still took human labor, so planters wanted far more enslaved workers.', es:'La demanda de mano de obra esclavizada aumentó mucho.', m:'The cotton gin created a huge demand for enslaved labor on plantations.'},
+  {q:'A classmate says, "Almost every white Southerner owned enslaved people." Which two facts from the chart prove them wrong?', o:['64% of white Southern families held no enslaved people','Only 36% held any enslaved people at all','18% held fewer than 5','15.5% held 5–49'], a:[0,1], two:true, chart:true, e:'Most white Southerners held no one. And among those who did, the largest group held fewer than 5.', es:'La mayoría no tenía personas esclavizadas.', m:'Most white Southerners held no enslaved people. The largest group of slaveholders held fewer than 5.'},
+  {q:'In 1820 there were about 1.5 million enslaved people in the South. By 1850 there were nearly 4 million, even though bringing people from Africa was illegal after 1808. How?', o:['Smuggling from Africa replaced the old trade','Natural population growth and the domestic slave trade','Immigrants were enslaved','Mexico sent enslaved people north'], a:[1], e:'Slaveholders forced high birthrates and bought and sold people within the U.S. Slavery grew stronger, not weaker.', es:'Crecimiento natural y comercio interno de esclavos.', m:'After 1808, natural population growth and the domestic slave trade made slavery stronger.'}
+ ]}
+];
+const FINAL = {q:'Evidence: Cotton production grew from 6,000 bales in 1792 to nearly 4 million in 1860, and the enslaved population nearly tripled from 1820 to 1850. Which conclusion does this evidence support?', o:['Slavery was slowly dying out','Slavery was becoming more central to the American economy','The North depended less on the South','The cotton gin reduced the need for labor'], a:[1], e:'Cotton profits made slavery bigger and more important than ever. Every wrong answer says slavery faded.', es:'La esclavitud se volvió más importante para la economía.', m:'The cotton gin intensified slavery by making cotton very profitable.'};
+
+const VALUES=[100,200,300,400,500];
+const KEY='unit2-review-game-v2';
+
+let state = load() || fresh();
+function fresh(){ return {teams:[{name:'Team 1',score:0},{name:'Team 2',score:0},{name:'Team 3',score:0},{name:'Team 4',score:0}], used:[], finalDone:false}; }
+function load(){ try{ const s=localStorage.getItem(KEY); return s?JSON.parse(s):null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+const boardEl=document.getElementById('board'), scoresEl=document.getElementById('scores'), overlay=document.getElementById('overlay'), qBox=document.getElementById('qBox');
+
+function renderBoard(){
+  boardEl.innerHTML='';
+  CATS.forEach(c=>{ const d=document.createElement('div'); d.className='cat'; d.textContent=c.name; boardEl.appendChild(d); });
+  VALUES.forEach((v,row)=>{ CATS.forEach((c,col)=>{
+    const id=col+'-'+row, b=document.createElement('button'), used=state.used.includes(id);
+    b.className='tile'+(used?' used':''); b.textContent=used?'':v; b.disabled=used;
+    b.setAttribute('aria-label', c.name+' for '+v+(used?', already played':''));
+    b.onclick=()=>openQ(col,row); boardEl.appendChild(b);
+  });});
+}
+function renderScores(){
+  scoresEl.innerHTML='';
+  state.teams.forEach((t,i)=>{
+    const d=document.createElement('div'); d.className='team';
+    d.innerHTML=`<input aria-label="Team name" value="${t.name.replace(/"/g,'&quot;')}"><div class="score">${t.score}</div><div class="adj"><button aria-label="Subtract 100">−100</button><button aria-label="Add 100">+100</button></div>`;
+    const [inp]=d.getElementsByTagName('input'); inp.onchange=()=>{ t.name=inp.value||('Team '+(i+1)); save(); };
+    const [minus,plus]=d.querySelectorAll('.adj button'); minus.onclick=()=>{t.score-=100;save();renderScores();}; plus.onclick=()=>{t.score+=100;save();renderScores();};
+    scoresEl.appendChild(d);
+  });
+}
+function optsHTML(Q){ return '<div class="opts">'+Q.o.map((o,i)=>`<button type="button" class="opt" data-i="${i}"><b>${'ABCD'[i]}</b><span>${o}</span></button>`).join('')+'</div><p class="redeem" aria-live="polite"></p>'; }
+function wireOpts(Q,onDone){
+  let found=0; const need=Q.a.length;
+  qBox.querySelectorAll('.opt').forEach(el=>el.onclick=()=>{
+    if(el.classList.contains('right')||el.classList.contains('miss')||(current&&current.revealed)) return;
+    const i=+el.dataset.i, msg=qBox.querySelector('.redeem');
+    if(Q.a.includes(i)){
+      el.classList.add('right'); found++;
+      if(found<need){ msg.textContent='Correct! One more right answer to find.'; msg.className='redeem good'; }
+      else { msg.textContent=''; msg.className='redeem'; onDone(); }
+    } else {
+      el.classList.add('miss'); msg.textContent='Not quite. Redemption chance for the next team!'; msg.className='redeem bad';
+    }
+  });
+}
+function revealIn(Q){
+  qBox.querySelectorAll('.opt').forEach(el=>{ const i=+el.dataset.i; if(Q.a.includes(i)) el.classList.add('right'); else if(!el.classList.contains('miss')) el.classList.add('wrong'); });
+  const m=qBox.querySelector('.redeem'); if(m){ m.textContent=''; m.className='redeem'; }
+  qBox.querySelector('.explain').classList.add('show');
+}
+let current=null;
+function openQ(col,row){
+  const C=CATS[col], Q=C.qs[row], v=VALUES[row]; current={col,row,Q,v,revealed:false};
+  qBox.innerHTML=`<div class="q-meta"><span>${C.name} · ${v}</span></div>
+  <h2 id="qText">${Q.q}</h2>${Q.two?'<span class="select-note">Select two</span>':''}${Q.chart?PIE:''}${optsHTML(Q)}
+  <div class="explain"><div class="remember"><span class="rlabel">If you missed it, write this down:</span>${Q.m}</div><p class="why">${Q.e}<span class="es">${Q.es}</span></p></div>
+  <div class="q-actions"><button class="btn primary" id="revealBtn">Reveal answer</button>
+  <div class="award" id="award">${state.teams.map((t,i)=>`<button class="btn" data-t="${i}">+${v} ${t.name}</button>`).join('')}<button class="btn miss" id="noneBtn">No one</button></div>
+  <button class="btn" id="backBtn">Back to board</button><span class="hint">Click an answer to check it · Space: reveal · Esc: back</span></div>`;
+  overlay.classList.add('open'); overlay.scrollTop=0;
+  document.getElementById('revealBtn').onclick=reveal;
+  wireOpts(Q,reveal);
+  document.getElementById('backBtn').onclick=closeQ;
+  document.getElementById('noneBtn').onclick=closeQ;
+  qBox.querySelectorAll('#award [data-t]').forEach(b=>b.onclick=()=>{ b.disabled=true; b.style.background='var(--good)'; state.teams[+b.dataset.t].score+=v; save(); renderScores(); });
+  if(!state.used.includes(col+'-'+row)){ state.used.push(col+'-'+row); save(); }
+}
+function reveal(){ if(!current||current.revealed) return; current.revealed=true; revealIn(current.Q); document.getElementById('award').classList.add('show'); document.getElementById('revealBtn').style.display='none'; }
+function closeQ(){ overlay.classList.remove('open'); current=null; renderBoard(); }
+
+function openFinal(){
+  current={final:true,revealed:false};
+  qBox.innerHTML=`<div class="q-meta"><span>Final Question · Slavery in the South</span></div>
+  <p style="font-size:1.1em;margin:18px 0 6px">Each team writes a secret wager, from 0 up to its current score. Enter wagers, then reveal the question.</p>
+  <div class="wagers">${state.teams.map((t,i)=>`<div class="wager" data-t="${i}"><strong>${t.name} (${t.score})</strong><input type="number" min="0" max="${Math.max(0,t.score)}" value="0" aria-label="Wager for ${t.name}"><div class="row"><button class="btn" data-r="1">Correct</button><button class="btn" data-r="0">Wrong</button></div></div>`).join('')}</div>
+  <div id="finalQ" style="display:none"><h2 id="qText">${FINAL.q}</h2><span class="select-note">Best evaluates</span>${optsHTML(FINAL)}<div class="explain"><div class="remember"><span class="rlabel">If you missed it, write this down:</span>${FINAL.m}</div><p class="why">${FINAL.e}<span class="es">${FINAL.es}</span></p></div></div>
+  <div class="q-actions"><button class="btn primary" id="showFinal">Show question</button><button class="btn" id="revealBtn" style="display:none">Reveal answer</button><button class="btn" id="backBtn">Back to board</button></div>`;
+  overlay.classList.add('open'); overlay.scrollTop=0;
+  document.getElementById('showFinal').onclick=()=>{ document.getElementById('finalQ').style.display='block'; document.getElementById('showFinal').style.display='none'; document.getElementById('revealBtn').style.display=''; };
+  const finalReveal=()=>{ if(current.revealed) return; current.revealed=true; revealIn(FINAL); document.getElementById('revealBtn').style.display='none'; };
+  document.getElementById('revealBtn').onclick=finalReveal;
+  wireOpts(FINAL,finalReveal);
+  document.getElementById('backBtn').onclick=closeQ;
+  qBox.querySelectorAll('.wager').forEach(w=>{
+    const i=+w.dataset.t, inp=w.querySelector('input');
+    w.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{
+      const t=state.teams[i]; const wager=Math.max(0,Math.min(Math.max(0,t.score),parseInt(inp.value||'0',10)||0));
+      t.score += b.dataset.r==='1'?wager:-wager; save(); renderScores();
+      w.querySelector('.row').outerHTML=`<span class="done">${b.dataset.r==='1'?'+':'−'}${wager} · now ${t.score}</span>`; inp.disabled=true;
+    });
+  });
+}
+document.getElementById('finalBtn').onclick=openFinal;
+document.getElementById('addTeam').onclick=()=>{ if(state.teams.length<8){ state.teams.push({name:'Team '+(state.teams.length+1),score:0}); save(); renderScores(); } };
+document.getElementById('removeTeam').onclick=()=>{ if(state.teams.length>1){ state.teams.pop(); save(); renderScores(); } };
+document.getElementById('reset').onclick=()=>{ if(confirm('Start a new game? Scores and played questions will be cleared.')){ state=fresh(); save(); renderBoard(); renderScores(); } };
+document.addEventListener('keydown',e=>{
+  if(!overlay.classList.contains('open')) return;
+  if(e.key==='Escape'){ closeQ(); }
+  else if((e.key===' '||e.key==='Enter') && current && !current.final && document.activeElement.tagName!=='INPUT'){ e.preventDefault(); reveal(); }
+});
+renderBoard(); renderScores();
+</script>
+</body>
+</html>
